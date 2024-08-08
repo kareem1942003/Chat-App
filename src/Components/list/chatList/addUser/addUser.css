@@ -1,7 +1,7 @@
 .addUser {
   z-index: 1;
-  width: 35%;
-  max-height: 54%;
+  width: 90%;
+  max-height: 50%;
   overflow: auto;
   padding: 30px;
   background-color: rgba(17, 25, 40, 0.902);

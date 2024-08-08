@@ -12,11 +12,19 @@ import { db } from "../../lib/firebase";
 import { useChatStore } from "../../lib/chatStore";
 import { useUserStore } from "../../lib/userStore";
 import upload from "../../lib/upload";
+import { Button, Spinner } from "react-bootstrap";
+import { useDispatch } from "react-redux";
+import {
+  toggleChatUI,
+  toggleDetailUI,
+  toggleListUI,
+} from "../../RTK/ResponseveUi";
 
 const Chat = () => {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const [chat, setChat] = useState();
+  const [isLoading, setIsLoading] = useState(false);
   const { chatId, user, isCurrentUserBlocked, isReceiverBlocked } =
     useChatStore();
   const { currentUser } = useUserStore();
@@ -24,6 +32,18 @@ const Chat = () => {
     file: null,
     url: "",
   });
+
+  const dispatch = useDispatch();
+
+  const handleCloseAndOpenList = () => {
+    dispatch(toggleListUI());
+  };
+  const handleCloseAndOpenChat = () => {
+    dispatch(toggleChatUI());
+  };
+  const handleCloseAndOpenDetail = () => {
+    dispatch(toggleDetailUI());
+  };
 
   const handlImg = (e) => {
     if (e.target.files[0]) {
@@ -60,6 +80,7 @@ const Chat = () => {
     let imgUrl = null;
 
     try {
+      setIsLoading(true);
       if (img.file) {
         imgUrl = await upload(img.file);
       }
@@ -104,22 +125,35 @@ const Chat = () => {
       url: "",
     });
     setText("");
+    setIsLoading(false);
   };
+
   return (
     <div className="chat">
       <div className="top">
-        <div className="user">
+        <div
+          className="icons"
+          onClick={() => {
+            handleCloseAndOpenList();
+            handleCloseAndOpenChat();
+          }}
+        >
+          <img src="./arrowLeft.png" alt="" />
+        </div>
+        <div
+          className="user"
+          onClick={() => {
+            handleCloseAndOpenDetail();
+            handleCloseAndOpenChat();
+          }}
+        >
           <img src={user?.avatar || "./avatar.png"} alt="" />
           <div className="texts">
             <span>{user?.username}</span>
             <p>Lorem, ipsum dolor sit amet consectetu.</p>
           </div>
         </div>
-        <div className="icons">
-          <img src="./phone.png" alt="" />
-          <img src="./video.png" alt="" />
-          <img src="./info.png" alt="" />
-        </div>
+        <div className="icons">{/* <img src="./info.png" alt="" /> */}</div>
       </div>
       <div className="center">
         {
@@ -131,7 +165,9 @@ const Chat = () => {
                 message.senderId === currentUser?.id ? "message own" : "message"
               }
             >
-              {/* <img src="./avatar.png" alt="" /> */}
+              {message.senderId === currentUser?.id ? null : (
+                <img src={user.avatar} alt="" />
+              )}
               <div className="texts">
                 {message.img && <img src={message.img} alt="" />}
                 <p>{message.text}</p>
@@ -161,8 +197,6 @@ const Chat = () => {
             style={{ display: "none" }}
             onChange={handlImg}
           />
-          <img src="./camera.png" alt="" />
-          <img src="./mic.png" alt="" />
         </div>
         <textarea
           value={text}
@@ -175,23 +209,30 @@ const Chat = () => {
           onChange={(e) => setText(e.target.value)}
           disabled={isCurrentUserBlocked || isReceiverBlocked}
         />
-        <div className="emoji">
-          <img
-            src="./emoji.png"
-            alt=""
-            onClick={() => setOpen((prev) => !prev)}
-          />
-          <div className="picker">
-            <EmojiPicker open={open} onEmojiClick={handelEmoji} />
+        <div className="button">
+          <div className="emoji">
+            <img
+              src="./emoji.png"
+              alt=""
+              onClick={() => setOpen((prev) => !prev)}
+            />
+            <div className="picker">
+              <EmojiPicker open={open} onEmojiClick={handelEmoji} />
+            </div>
           </div>
+          {isLoading ? (
+            <Button disabled={isLoading}>
+              <Spinner animation="border" size="sm" />
+            </Button>
+          ) : (
+            <Button
+              onClick={handleSend}
+              disabled={isCurrentUserBlocked || isReceiverBlocked}
+            >
+              Send
+            </Button>
+          )}
         </div>
-        <button
-          onClick={handleSend}
-          className="sendButton"
-          disabled={isCurrentUserBlocked || isReceiverBlocked}
-        >
-          Send
-        </button>
       </div>
     </div>
   );

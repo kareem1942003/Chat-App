@@ -9,8 +9,16 @@ import {
 import { auth, db } from "../../lib/firebase";
 import { doc, setDoc } from "firebase/firestore";
 import upload from "../../lib/upload";
+import { useDispatch, useSelector } from "react-redux";
+import { toggleSignInUI } from "../../RTK/ResponseveUi";
 
 const Login = () => {
+  const dispatch = useDispatch();
+  const openSignInPage = () => {
+    dispatch(toggleSignInUI());
+  };
+  // @ts-ignore
+  const signInIsOpen = useSelector((state) => state.responsiveUi.signInIsOpen);
   const [avatar, setAvatar] = useState({
     file: null,
     url: "",
@@ -43,16 +51,19 @@ const Login = () => {
       toast.error(err.message);
     } finally {
       setLoading(false);
+      openSignInPage();
     }
   };
 
   const handlRegister = async (e) => {
     e.preventDefault();
+
     setLoading(true);
     const formData = new FormData(e.target);
 
     // @ts-ignore
     const { username, email, password } = Object.fromEntries(formData);
+
     try {
       const res = await createUserWithEmailAndPassword(auth, email, password);
 
@@ -76,66 +87,85 @@ const Login = () => {
       toast.error(err.message);
     } finally {
       setLoading(false);
+      openSignInPage();
     }
   };
 
   return (
     <div className="login">
-      <div className="item">
-        <h4>Welcom back,</h4>
-        <Form onSubmit={handlLogin}>
-          <FormGroup>
-            <Form.Label htmlFor="email">Email</Form.Label>
-            <Form.Control type="text" name="email" id="email"></Form.Control>
-          </FormGroup>
-          <FormGroup>
-            <Form.Label htmlFor="password">Password</Form.Label>
-            <Form.Control
-              type="password"
-              name="password"
-              id="password"
-            ></Form.Control>
-          </FormGroup>
-          <Button disabled={loading} type="submit">
-            {loading ? "Loading..." : "Sign in"}
-          </Button>
-        </Form>
-      </div>
-      <div className="separator"></div>
-      <div className="item">
-        <h4>Create An Account!</h4>
-        <Form onSubmit={handlRegister}>
-          <FormGroup>
-            <div className="img">
-              <img src={avatar.url || "./avatar.png"} alt="" />
-            </div>
-            <Form.Control id="file" type="file" onChange={handlAvatar} />
-          </FormGroup>
-          <FormGroup>
-            <Form.Label htmlFor="username">User Name</Form.Label>
-            <Form.Control
-              type="text"
-              name="username"
-              id="username"
-            ></Form.Control>
-          </FormGroup>
-          <FormGroup>
-            <Form.Label htmlFor="email2">Email</Form.Label>
-            <Form.Control type="text" name="email" id="email2"></Form.Control>
-          </FormGroup>
-          <FormGroup>
-            <Form.Label htmlFor="password2">Password</Form.Label>
-            <Form.Control
-              type="password"
-              name="password"
-              id="password2"
-            ></Form.Control>
-          </FormGroup>
-          <Button disabled={loading} type="submit">
-            {loading ? "Loading..." : "Sign Up"}
-          </Button>
-        </Form>
-      </div>
+      {signInIsOpen ? (
+        <div className="item">
+          <h4>Welcom back,</h4>
+          <Form onSubmit={handlLogin}>
+            <FormGroup>
+              <Form.Label htmlFor="email">Email</Form.Label>
+              <Form.Control type="text" name="email" id="email"></Form.Control>
+            </FormGroup>
+            <FormGroup>
+              <Form.Label htmlFor="password">Password</Form.Label>
+              <Form.Control
+                type="password"
+                name="password"
+                id="password"
+              ></Form.Control>
+            </FormGroup>
+            <Button disabled={loading} type="submit">
+              {loading ? "Loading..." : "Sign in"}
+            </Button>
+            <p
+              style={{ cursor: "pointer" }}
+              onClick={() => {
+                openSignInPage();
+              }}
+            >
+              Craete An Account!
+            </p>
+          </Form>
+        </div>
+      ) : (
+        <div className="item">
+          <h4>Create An Account!</h4>
+          <Form onSubmit={handlRegister}>
+            <FormGroup>
+              <div className="img">
+                <img src={avatar.url || "./avatar.png"} alt="" />
+              </div>
+              <Form.Control id="file" type="file" onChange={handlAvatar} />
+            </FormGroup>
+            <FormGroup>
+              <Form.Label htmlFor="username">User Name</Form.Label>
+              <Form.Control
+                type="text"
+                name="username"
+                id="username"
+              ></Form.Control>
+            </FormGroup>
+            <FormGroup>
+              <Form.Label htmlFor="email2">Email</Form.Label>
+              <Form.Control type="text" name="email" id="email2"></Form.Control>
+            </FormGroup>
+            <FormGroup>
+              <Form.Label htmlFor="password2">Password</Form.Label>
+              <Form.Control
+                type="password"
+                name="password"
+                id="password2"
+              ></Form.Control>
+            </FormGroup>
+            <Button disabled={loading} type="submit">
+              {loading ? "Loading..." : "Sign Up"}
+            </Button>
+            <p
+              style={{ cursor: "pointer" }}
+              onClick={() => {
+                openSignInPage();
+              }}
+            >
+              Already Have An Account!
+            </p>
+          </Form>
+        </div>
+      )}
     </div>
   );
 };

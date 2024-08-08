@@ -3,8 +3,22 @@ import { useChatStore } from "../../lib/chatStore";
 import { auth, db } from "../../lib/firebase";
 import "./detail.css";
 import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
+import { useDispatch } from "react-redux";
+import {
+  toggleChatUI,
+  toggleDetailUI,
+  toggleListUI,
+} from "../../RTK/ResponseveUi";
 
 const Detail = () => {
+  const dispatch = useDispatch();
+
+  const handleCloseAndOpenChat = () => {
+    dispatch(toggleChatUI());
+  };
+  const handleCloseAndOpenDetail = () => {
+    dispatch(toggleDetailUI());
+  };
   const { chatId, user, isCurrentUserBlocked, isReceiverBlocked, changeBlock } =
     useChatStore();
   const { currentUser } = useUserStore();
@@ -23,10 +37,21 @@ const Detail = () => {
   };
   return (
     <div className="detail">
-      <div className="user">
-        <img src={user?.avatar || "./avatar.png"} alt="" />
-        <h4>{user?.username}</h4>
-        <p>Lorem ipsum dolor sit amet.</p>
+      <div className="userInfoo">
+        <div
+          className="icons"
+          onClick={() => {
+            handleCloseAndOpenDetail();
+            handleCloseAndOpenChat();
+          }}
+        >
+          <img src="./arrowLeft.png" alt="" />
+        </div>
+        <div className="user">
+          <img src={user?.avatar || "./avatar.png"} alt="" />
+          <h4>{user?.username}</h4>
+          <p>Lorem ipsum dolor sit amet.</p>
+        </div>
       </div>
       <div className="info">
         <div className="option">

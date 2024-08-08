@@ -1,6 +1,8 @@
 import { useChatStore } from "../../../lib/chatStore";
 import { useUserStore } from "../../../lib/userStore";
+import LogoutIcon from "@mui/icons-material/Logout";
 import "./userInfo.css";
+import { auth } from "../../../lib/firebase";
 
 const UserInfo = () => {
   const { currentUser, isLoading, fetchUserInfo } = useUserStore();
@@ -12,7 +14,9 @@ const UserInfo = () => {
         <h6>{currentUser.username}</h6>
       </div>
       <div className="icons">
-        <img src="./more.png" alt="" />
+        <div onClick={() => auth.signOut()}>
+          <LogoutIcon sx={{ cursor: "pointer" }} />
+        </div>
         <img src="./video.png" alt="" />
         <img src="./edit.png" alt="" />
       </div>

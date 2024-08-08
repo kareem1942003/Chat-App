@@ -5,11 +5,22 @@ import { useUserStore } from "../../../lib/userStore";
 import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import { useChatStore } from "../../../lib/chatStore";
+import { useDispatch } from "react-redux";
+import { toggleChatUI, toggleListUI } from "../../../RTK/ResponseveUi";
 
 const ChatList = () => {
   const [chats, setChats] = useState([]);
   const [addMode, setAddMode] = useState(false);
   const [input, setInput] = useState("");
+
+  const dispatch = useDispatch();
+
+  const handleCloseAndOpenList = () => {
+    dispatch(toggleListUI());
+  };
+  const handleCloseAndOpenChat = () => {
+    dispatch(toggleChatUI());
+  };
 
   const { currentUser } = useUserStore();
   const { chatId, changeChat } = useChatStore();
@@ -92,7 +103,11 @@ const ChatList = () => {
           <div
             key={chat.chatId}
             className="item"
-            onClick={() => handleSelect(chat)}
+            onClick={() => {
+              handleSelect(chat);
+              handleCloseAndOpenList();
+              handleCloseAndOpenChat();
+            }}
             style={{
               backgroundColor: chat?.isSeen ? "transparent" : "#5183fe",
             }}
