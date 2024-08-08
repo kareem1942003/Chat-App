@@ -142,13 +142,17 @@ const Login = () => {
             </FormGroup>
             <FormGroup>
               <Form.Label htmlFor="email2">Email</Form.Label>
-              <Form.Control type="text" name="email" id="email2"></Form.Control>
+              <Form.Control
+                type="text"
+                name="email2"
+                id="email2"
+              ></Form.Control>
             </FormGroup>
             <FormGroup>
               <Form.Label htmlFor="password2">Password</Form.Label>
               <Form.Control
                 type="password"
-                name="password"
+                name="password2"
                 id="password2"
               ></Form.Control>
             </FormGroup>
